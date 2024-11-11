@@ -61,63 +61,67 @@ struct ContentView: View {
     
     // MARK: BODY
     var body: some View {
-        VStack {
-            HStack(alignment: .center, spacing: 6) {
-                TextField("Add New Note", text: $text)
-                
-                Button {
-                    // 1. Only run the button's action when the text field is not empty
-                    guard text.isEmpty == false else { return }
+        NavigationView {
+            VStack {
+                HStack(alignment: .center, spacing: 6) {
+                    TextField("Add New Note", text: $text)
                     
-                    // 2. Create a new note item and init it with the text value
-                    let note = Note(id: UUID(), text: text)
-                    
-                    // 3. Add the new note item to the notes array (append)
-                    notes.append(note)
-                    
-                    // 4. Make the text field empty
-                    text = ""
-                    
-                    //5. Save the notes (function)
-                    save()
-                } label: {
-                    Image(systemName: "plus.circle")
-                        .font(.system(size: 42, weight: .semibold))
-                }
-                .fixedSize()
-                .buttonStyle(PlainButtonStyle())
-                .foregroundColor(.accentColor)
-//                .buttonStyle(BorderedButtonStyle(tint: .accentColor))
-            } //: HSTACK
-            Spacer()
-            if notes.count >= 1 {
-                List {
-                    ForEach(0..<notes.count, id: \.self) { i in
-                        HStack {
-                            Capsule()
-                                .frame(width: 4)
-                                .foregroundColor(.accentColor)
-                            
-                            Text(notes[i].text)
-                                .lineLimit(1)
-                                .padding(.leading, 5)
-                        } //: HSTACK
-                    } //: LOOP
-                    .onDelete(perform: delete)
-                }
-            } else {
+                    Button {
+                        // 1. Only run the button's action when the text field is not empty
+                        guard text.isEmpty == false else { return }
+                        
+                        // 2. Create a new note item and init it with the text value
+                        let note = Note(id: UUID(), text: text)
+                        
+                        // 3. Add the new note item to the notes array (append)
+                        notes.append(note)
+                        
+                        // 4. Make the text field empty
+                        text = ""
+                        
+                        //5. Save the notes (function)
+                        save()
+                    } label: {
+                        Image(systemName: "plus.circle")
+                            .font(.system(size: 42, weight: .semibold))
+                    }
+                    .fixedSize()
+                    .buttonStyle(PlainButtonStyle())
+                    .foregroundColor(.accentColor)
+                    //                .buttonStyle(BorderedButtonStyle(tint: .accentColor))
+                } //: HSTACK
                 Spacer()
-                Image(systemName: "note.text")
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundColor(.gray)
-                    .opacity(0.25)
-                    .padding(25)
-                Spacer()
+                if notes.count >= 1 {
+                    List {
+                        ForEach(0..<notes.count, id: \.self) { i in
+                            NavigationLink(destination: DetailView(note: notes[i], count: notes.count, index: i)) {
+                                HStack {
+                                    Capsule()
+                                        .frame(width: 4)
+                                        .foregroundColor(.accentColor)
+                                    
+                                    Text(notes[i].text)
+                                        .lineLimit(1)
+                                        .padding(.leading, 5)
+                                }
+                            } //: HSTACK
+                        } //: LOOP
+                        .onDelete(perform: delete)
+                    }
+                } else {
+                    Spacer()
+                    Image(systemName: "note.text")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.gray)
+                        .opacity(0.25)
+                        .padding(25)
+                    Spacer()
+                }
+            } //: VSTACK
+            .onAppear() {
+                load()
             }
-        } //: VSTACK
-        .onAppear() {
-            load()
         }
     }
 }
